@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.woopy.mapper.BlogTagMapper">
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT into t_blog_tags(blogs_id,tags_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.blogsId,jdbcType=BIGINT},#{item.tagsId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <select id="selByTagsId" resultType="int">
+        select
+        DISTINCT(tags_id)
+        from t_blog_tags
+        where tags_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selByTagSIdGetBlogId" parameterType="Integer" resultType="Integer">
+        select
+        blogs_id
+        from t_blog_tags
+        WHERE tags_id = #{id}
+    </select>
+
+
+</mapper>

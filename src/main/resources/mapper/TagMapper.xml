@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.woopy.mapper.TagMapper">
+    <cache></cache>
+
+    <insert id="batchInsertBlogTag" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT into t_tag(name)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.name,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <select id="getAllList" parameterType="Map" resultType="Tag">
+        SELECT * FROM t_tag
+        WHERE is_deleted = 0
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <update id="deleteBatch">
+        UPDATE t_tag
+        SET is_deleted = 1
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="selByName" resultType="Tag">
+        SELECT * FROM t_tag WHERE `name` = #{name}
+    </select>
+
+    <select id="selById" resultType="Tag">
+        select * from t_tag where is_deleted = 0 and id = #{id}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*) FROM t_tag where is_deleted = 0
+    </select>
+
+    <select id="getTagTop" resultType="Tag">
+        select * from t_tag where is_deleted = 0 limit 0,#{size}
+    </select>
+
+    <insert id="saveTag" parameterType="Tag">
+        INSERT INTO t_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="isDeleted != null">
+                is_deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

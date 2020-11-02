@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/blog?serverTimezone=UTC&characterEncoding=utf-8
+
+  thymeleaf:
+    cache: false
+  resources:
+    static-locations:
+      - classpath:/static/
+      - classpath:/templates/
+  devtools:
+    restart:
+      exclude:
+      - static
+      - templates
+  redis:
+    host: 47.112.181.107
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: org.woopy.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+logging:
+  level:
+    root: info
+    org.woopy: debug
+  file:
+    name: log/blog.log
+
+comment:
+  avatar: /images/avatar.png
+
+server:
+  port: 8086
+
+

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.woopy.mapper.BlogMapper">
+    <cache></cache>
+
+    <resultMap id="BlogTagList" type="blog">
+        <id column="blog_id" property="blogId"/>
+        <result column="blog_title" property="blogTitle" />
+        <result column="blog_cover_image" property="blogCoverImage" />
+        <result column="blog_content" property="blogContent" />
+        <result column="blog_type_name" property="blogTypeName" />
+        <result column="blog_views" property="blogViews" />
+        <result column="update_time" property="updateTime" />
+        
+        <collection property="tags" ofType="tag">
+            <id column="id" property="id" />
+            <result column="name" property="name" />
+        </collection>
+    </resultMap>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*) FROM t_blog where is_deleted = 0
+    </select>
+
+    <select id="selByTypeName" resultType="Blog">
+        select * from t_blog where blog_type_name = #{name} and is_deleted = 0 and blog_status = 1
+    </select>
+
+    <select id="selByTypeId" resultType="Blog">
+        select * from t_blog where blog_type_id = #{id} and is_deleted = 0 and blog_status = 1
+    </select>
+
+    <select id="getBlogListSelStatus" resultType="Blog">
+        select * from t_blog
+        where blog_status = 1 and is_deleted = 0
+    </select>
+
+    <select id="getTagListByIdAndTagId" resultMap="BlogTagList" parameterType="int">
+        select t_blog.*,
+              t_tag.*
+        from t_blog,t_blog_tags,t_tag
+        where t_blog_tags.blogs_id = #{id} AND t_blog_tags.tags_id = t_tag.id
+    </select>
+
+    <select id="findBlogList" parameterType="Map" resultType="Blog">
+        SELECT * FROM t_blog WHERE is_deleted = 0
+        <if test="keyword!=null">
+            AND (blog_title like CONCAT('%',#{keyword},'%' ) or blog_type_name like CONCAT('%',#{keyword},'%' ))
+        </if>
+        ORDER BY blog_id DESC
+        <if test="start!=null and limit!=null">
+            limit #{start},#{limit}
+        </if>
+    </select>
+
+    <insert id="save" useGeneratedKeys="true" parameterType="Blog" keyProperty="blogId">
+        insert into t_blog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="blogId != null">
+                blog_id,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="blogTitle != null">
+                blog_title,
+            </if>
+            <if test="blogCoverImage != null">
+                blog_cover_image,
+            </if>
+            <if test="blogTypeId != null">
+                blog_type_id,
+            </if>
+            <if test="blogTypeName != null">
+                blog_type_name,
+            </if>
+            <if test="blogTags != null">
+                blog_tags,
+            </if>
+            <if test="blogStatus != null">
+                blog_status,
+            </if>
+            <if test="blogViews != null">
+                blog_views,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="blogContent != null">
+                blog_content,
+            </if>
+            <if test="flag != null">
+                flag,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="blogId != null">
+                #{blogId},
+            </if>
+            <if test="description != null">
+                #{description},
+            </if>
+            <if test="blogTitle != null">
+                #{blogTitle},
+            </if>
+            <if test="blogCoverImage != null">
+                #{blogCoverImage,jdbcType=VARCHAR},
+            </if>
+            <if test="blogTypeId != null">
+                #{blogTypeId,jdbcType=INTEGER},
+            </if>
+            <if test="blogTypeName != null">
+                #{blogTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="blogTags != null">
+                #{blogTags,jdbcType=VARCHAR},
+            </if>
+            <if test="blogStatus != null">
+                #{blogStatus,jdbcType=TINYINT},
+            </if>
+            <if test="blogViews != null">
+                #{blogViews,jdbcType=BIGINT},
+            </if>
+            <if test="isDeleted != null">
+                #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="blogContent != null">
+                #{blogContent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="flag != null">
+                #{flag},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="blog">
+        update t_blog
+        <set>
+            <if test="blogTitle != null">
+                blog_title = #{blogTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="blogCoverImage != null">
+                blog_cover_image = #{blogCoverImage,jdbcType=VARCHAR},
+            </if>
+            <if test="blogContent != null">
+                blog_content = #{blogContent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="blogTypeId != null">
+                blog_type_id = #{blogTypeId,jdbcType=INTEGER},
+            </if>
+            <if test="blogTypeName != null">
+                blog_type_name = #{blogTypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="blogTags != null">
+                blog_tags = #{blogTags,jdbcType=VARCHAR},
+            </if>
+            <if test="blogStatus != null">
+                blog_status = #{blogStatus,jdbcType=TINYINT},
+            </if>
+            <if test="blogViews != null">
+                blog_views = #{blogViews,jdbcType=BIGINT},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted,jdbcType=TINYINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="blogContent != null">
+                blog_content = #{blogContent,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="flag != null">
+                flag = #{flag},
+            </if>
+        </set>
+        where blog_id = #{blogId,jdbcType=BIGINT}
+    </update>
+
+    <update id="deleteBatch" >
+        update t_blog
+        SET is_deleted = 1 WHERE blog_id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateBlogType">
+        update t_blog
+        set blog_type_id = #{id,jdbcType=INTEGER},
+        blog_type_name = #{name,jdbcType=VARCHAR}
+        where blog_type_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        and is_deleted =0
+    </update>
+
+    <select id="selBylikeTagName" resultType="Blog">
+        <bind name="text" value="'%'+name+'%'" />
+        SELECT * FROM t_blog
+        WHERE is_deleted = 0 AND blog_status = 1 AND blog_tags LIKE #{text}
+    </select>
+
+    <select id="findGroupYear" resultType="String">
+        SELECT DATE_FORMAT(b.update_time,'%Y') AS year FROM t_blog b
+        WHERE b.blog_status = 1 AND b.is_deleted = 0
+        GROUP BY year ORDER BY year DESC
+    </select>
+    
+    <select id="findByYear" resultType="Blog" parameterType="String">
+        SELECT * FROM t_blog b
+        WHERE DATE_FORMAT(b.update_time,'%Y') = #{year}
+              AND b.is_deleted = 0 AND blog_status = 1
+    </select>
+
+    <select id="selBytitle" resultType="Blog" parameterType="String">
+        select * from t_blog
+        WHERE is_deleted = 0 AND blog_status =1
+        AND blog_title like CONCAT('%',#{text},'%')<!-- OR blog_type_name like CONCAT('%',#{text},'%' ))-->
+    </select>
+
+</mapper>
